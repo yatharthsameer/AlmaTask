@@ -1,3 +1,11 @@
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
 from fastapi import FastAPI, File, Form, HTTPException, Depends, UploadFile, status, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -45,6 +53,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @app.post("/api/leads", status_code=status.HTTP_201_CREATED)
 async def create_lead(
+    background_tasks: BackgroundTasks,  # Inject as parameter
     first_name: str = Form(...),
     last_name: str = Form(...),
     email: str = Form(...),
@@ -87,10 +96,9 @@ async def create_lead(
     )
     db.create_lead(lead)
 
-    # Send notifications
-    background_tasks: BackgroundTasks = BackgroundTasks()
-    await send_prospect_email(background_tasks, lead)
-    await send_attorney_email(background_tasks, lead)
+    # Add email tasks to background tasks
+    background_tasks.add_task(send_prospect_email, lead)
+    background_tasks.add_task(send_attorney_email, lead)
 
     return {"id": lead.id}
 
@@ -144,3 +152,19 @@ async def get_resume(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Lead not found"
     )
+    
+@app.post("/api/test/email")
+async def test_email(background_tasks: BackgroundTasks):
+    """Test endpoint to verify email sending"""
+    test_lead = Lead(
+        first_name="Test",
+        last_name="User",
+        email="test@example.com",
+        resume_path="test_path"
+    )
+    
+    # Add email tasks to background tasks
+    background_tasks.add_task(send_prospect_email, test_lead)
+    background_tasks.add_task(send_attorney_email, test_lead)
+    
+    return {"message": "Test emails triggered"}

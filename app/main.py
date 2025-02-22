@@ -1,6 +1,5 @@
 import logging
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -23,16 +22,14 @@ from .config import UPLOAD_DIR, ALLOWED_EXTENSIONS, MAX_FILE_SIZE
 
 app = FastAPI()
 
-# Disable CORS. Do not remove this for full-stack development.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["*"],  
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"], 
+    allow_headers=["*"],  
 )
 
-# Ensure upload directory exists
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 @app.get("/healthz")
@@ -41,7 +38,6 @@ async def healthz():
 
 @app.post("/api/auth/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    # For MVP, we'll use a simple hardcoded check
     if form_data.username == "attorney" and form_data.password == "password":
         access_token = create_access_token(data={"sub": form_data.username})
         return {"access_token": access_token, "token_type": "bearer"}
@@ -59,7 +55,6 @@ async def create_lead(
     email: str = Form(...),
     resume: UploadFile = File(...),
 ):
-    # Validate file extension
     file_ext = os.path.splitext(resume.filename)[1].lower()
     if file_ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
@@ -67,7 +62,6 @@ async def create_lead(
             detail=f"File extension not allowed. Use: {', '.join(ALLOWED_EXTENSIONS)}"
         )
 
-    # Save resume file
     file_id = uuid4()
     file_path = UPLOAD_DIR / f"{file_id}{file_ext}"
     
@@ -87,7 +81,6 @@ async def create_lead(
             detail="Could not save file"
         )
 
-    # Create lead
     lead = Lead(
         first_name=first_name,
         last_name=last_name,
@@ -96,7 +89,6 @@ async def create_lead(
     )
     db.create_lead(lead)
 
-    # Add email tasks to background tasks
     background_tasks.add_task(send_prospect_email, lead)
     background_tasks.add_task(send_attorney_email, lead)
 
@@ -163,7 +155,6 @@ async def test_email(background_tasks: BackgroundTasks):
         resume_path="test_path"
     )
     
-    # Add email tasks to background tasks
     background_tasks.add_task(send_prospect_email, test_lead)
     background_tasks.add_task(send_attorney_email, test_lead)
     

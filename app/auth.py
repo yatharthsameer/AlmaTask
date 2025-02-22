@@ -6,8 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 import os
 
-# Get settings from environment
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-here")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "helloworld")
 ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

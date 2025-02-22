@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 # Email configuration
 ATTORNEY_EMAIL = os.getenv("ATTORNEY_EMAIL", "thesameerbros@gmail.com")
 SMTP_USERNAME = os.getenv("SMTP_USERNAME", "ytharthsmr@gmail.com")
-SMTP_PASSWORD = "ihqr ymgt cnpa oyul"
+SMTP_PASSWORD = "ihqr ymgt cnpa oyul" #directly added password
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 
@@ -27,7 +27,6 @@ def _send_email_sync(to_email: str, subject: str, body: str):
         # Log connection attempt for debugging
         logger.info(f"Attempting to connect to SMTP server {SMTP_SERVER}:{SMTP_PORT}")
         
-        # Get password from environment or .env file
         smtp_password = "ihqr ymgt cnpa oyul"
         if not smtp_password:
             smtp_password = SMTP_PASSWORD

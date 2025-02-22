@@ -1,5 +1,8 @@
 # Lead Management System - Setup Guide
 
+Demo Video: https://www.loom.com/share/f6aa5562a04a49f3ba7cc7d5708393d2?sid=6360bdc5-eda7-42b3-9024-dc62e19bd7e2
+
+
 ## Prerequisites
 - Python 3.12 or higher
 - pip (Python package manager)
